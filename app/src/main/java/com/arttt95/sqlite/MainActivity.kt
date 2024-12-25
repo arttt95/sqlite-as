@@ -7,8 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.arttt95.sqlite.database.DatabaseHelper
+import com.arttt95.sqlite.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private val binding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
 
     private val bancoDados by lazy {
         DatabaseHelper(this)
@@ -17,20 +22,38 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
+        with(binding) {
+
+            btnSalvar.setOnClickListener {
+                salvar()
+            }
+
+            btnListar.setOnClickListener {
+                listar()
+            }
+
+        }
+
+    }
+
+    private fun salvar() {
+
+        val titulo = binding.editProduto.text.toString()
+
         val sql = "INSERT INTO " +
-                        "produtos " +
-                    "VALUES(" +
-                        "NULL, " +
-                        "'Notebook', " +
-                        "'Descrição...'" +
-                    ");"
+                "produtos " +
+                "VALUES(" +
+                "NULL, " +
+                "'${titulo}', " +
+                "'Descrição...'" +
+                ");"
 
         try {
             bancoDados.writableDatabase.execSQL(sql)
@@ -38,5 +61,9 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.i("info_db", "Erro ao inserir registro main")
         }
+    }
+
+    private fun listar() {
+        TODO("Not yet implemented")
     }
 }
