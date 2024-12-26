@@ -46,13 +46,14 @@ class MainActivity : AppCompatActivity() {
     private fun salvar() {
 
         val titulo = binding.editProduto.text.toString()
+        val descricao = binding.editDescricao.text.toString()
 
         val sql = "INSERT INTO " +
-                "produtos " +
+                "${DatabaseHelper.TABELA_PRODUTOS} " +
                 "VALUES(" +
                 "NULL, " +
-                "'${titulo}', " +
-                "'Descrição...'" +
+                "'$titulo', " +
+                "'$descricao'" +
                 ");"
 
         try {
@@ -64,6 +65,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun listar() {
-        TODO("Not yet implemented")
+
+
+
+        try {
+            Log.i("info_db", "Sucesso ao listar registros main")
+
+            val sql = "SELECT * FROM ${DatabaseHelper.TABELA_PRODUTOS};"
+            val cursor = bancoDados.readableDatabase.rawQuery(sql, null)
+
+            val indiceId = cursor.getColumnIndex("${DatabaseHelper.ID_PRODUTO}")
+            val indiceTitulo = cursor.getColumnIndex("${DatabaseHelper.TITULO}")
+            val indiceDescricao = cursor.getColumnIndex("${DatabaseHelper.DESCRICAO}")
+
+            while (cursor.moveToNext()) {
+
+                val idProduto = cursor.getInt(indiceId)
+                val titulo = cursor.getString(indiceTitulo)
+                val descricao = cursor.getString(indiceDescricao)
+
+                Log.i("info_db", "Posição: $idProduto | Título: $titulo | Descrição: $descricao ")
+
+            }
+
+        } catch(e: Exception) {
+            Log.i("info_db", "Erro ao listar registros main")
+        }
+
     }
 }
