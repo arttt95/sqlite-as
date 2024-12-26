@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.arttt95.sqlite.database.DatabaseHelper
+import com.arttt95.sqlite.database.ProdutoDAO
 import com.arttt95.sqlite.databinding.ActivityMainBinding
+import com.arttt95.sqlite.model.Produto
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,21 +53,20 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun remover() {
+    private fun salvar() {
 
-        val sql =
-            "DELETE FROM " +
-                "${DatabaseHelper.TABELA_PRODUTOS} " +
-            "WHERE " +
-                "${DatabaseHelper.ID_PRODUTO} = 3;"
+        val titulo = binding.editProduto.text.toString()
+        val descricao = binding.editDescricao.text.toString()
 
+        val produtoDAO = ProdutoDAO(this)
 
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao remover registro(s) main")
-        } catch(e: Exception) {
-            Log.i("info_db", "Erro ao remover registro(s) main")
-        }
+        val produto = Produto(
+            -1,
+            titulo,
+            descricao
+        )
+
+        produtoDAO.salvar(produto)
 
     }
 
@@ -74,79 +75,39 @@ class MainActivity : AppCompatActivity() {
         val titulo = binding.editProduto.text.toString()
         val descricao = binding.editDescricao.text.toString()
 
-        val sql =
-            "UPDATE " +
-                "${DatabaseHelper.TABELA_PRODUTOS} " +
-            "SET " +
-                "${DatabaseHelper.TITULO} = '$titulo', " +
-                "${DatabaseHelper.DESCRICAO} = '$descricao' " +
-            "WHERE " +
-                "${DatabaseHelper.ID_PRODUTO} = 1;"
+        val produtoDAO = ProdutoDAO(this)
 
+        val produto = Produto(
+            7,
+            titulo,
+            descricao
+        )
 
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao atualizar registro(s) main")
-        } catch(e: Exception) {
-            Log.i("info_db", "Erro ao atualizar registro(s) main")
-        }
+        produtoDAO.atualizar(produto)
 
+    }
+
+    private fun remover() {
+
+        val produtoDAO = ProdutoDAO(this)
+
+        produtoDAO.remover(7)
     }
 
     private fun listar() {
 
-        val sql =
-            "SELECT " +
-                "* " +
-            "FROM " +
-                "${DatabaseHelper.TABELA_PRODUTOS};"
-        val cursor = bancoDados.readableDatabase.rawQuery(sql, null)
+        val produtoDAO = ProdutoDAO(this)
 
-        val indiceId = cursor.getColumnIndex("${DatabaseHelper.ID_PRODUTO}")
-        val indiceTitulo = cursor.getColumnIndex("${DatabaseHelper.TITULO}")
-        val indiceDescricao = cursor.getColumnIndex("${DatabaseHelper.DESCRICAO}")
+        val listaProdutos = produtoDAO.listar()
 
-        try {
-            Log.i("info_db", "Sucesso ao listar registros main")
-
-            while (cursor.moveToNext()) {
-
-                val idProduto = cursor.getInt(indiceId)
-                val titulo = cursor.getString(indiceTitulo)
-                val descricao = cursor.getString(indiceDescricao)
-
+        if(listaProdutos.isNotEmpty()) {
+            listaProdutos.forEach { produto ->
                 Log.i(
                     "info_db",
-                    "Posição: $idProduto | Título: $titulo | Descrição: $descricao "
-                )
-
+                    "ID: ${produto.idProduto} | Título: ${produto.titulo}")
             }
-
-        } catch(e: Exception) {
-            Log.i("info_db", "Erro ao listar registros main")
         }
 
-    }
-
-    private fun salvar() {
-
-        val titulo = binding.editProduto.text.toString()
-        val descricao = binding.editDescricao.text.toString()
-
-        val sql = "INSERT INTO " +
-                "${DatabaseHelper.TABELA_PRODUTOS} " +
-                "VALUES(" +
-                "NULL, " +
-                "'$titulo', " +
-                "'$descricao'" +
-                ");"
-
-        try {
-            bancoDados.writableDatabase.execSQL(sql)
-            Log.i("info_db", "Sucesso ao inserir registro main")
-        } catch (e: Exception) {
-            Log.i("info_db", "Erro ao inserir registro main")
-        }
     }
 
 }
