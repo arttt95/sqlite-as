@@ -2,6 +2,7 @@ package com.arttt95.sqlite
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -55,18 +56,42 @@ class MainActivity : AppCompatActivity() {
 
     private fun salvar() {
 
-        val titulo = binding.editProduto.text.toString()
-        val descricao = binding.editDescricao.text.toString()
+        if(!binding.editProduto.text.isNullOrEmpty() && !binding.editDescricao.text.isNullOrEmpty()) {
+            val titulo = binding.editProduto.text.toString()
+            val descricao = binding.editDescricao.text.toString()
 
-        val produtoDAO = ProdutoDAO(this)
+            val produtoDAO = ProdutoDAO(this)
 
-        val produto = Produto(
-            -1,
-            titulo,
-            descricao
-        )
+            val produto = Produto(
+                -1,
+                titulo,
+                descricao
+            )
 
-        produtoDAO.salvar(produto)
+//            produtoDAO.salvar(produto)
+
+            if(produtoDAO.salvar(produto)) {
+                Toast.makeText(
+                    this,
+                    "Sucesso ao cadastrar o produto!",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                binding.editProduto.setText("")
+                binding.editDescricao.setText("")
+
+            } else {
+                Toast.makeText(this,
+                    "Erro ao cadastrar o produto!",
+                    Toast.LENGTH_LONG).show()
+            }
+
+        } else {
+            Toast.makeText(
+                this,
+                "Preencha os campos Nome e Descrição",
+                Toast.LENGTH_LONG).show()
+        }
 
     }
 
@@ -78,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         val produtoDAO = ProdutoDAO(this)
 
         val produto = Produto(
-            7,
+            1,
             titulo,
             descricao
         )
@@ -91,21 +116,31 @@ class MainActivity : AppCompatActivity() {
 
         val produtoDAO = ProdutoDAO(this)
 
-        produtoDAO.remover(7)
+        produtoDAO.remover(1)
     }
 
     private fun listar() {
 
         val produtoDAO = ProdutoDAO(this)
 
-        val listaProdutos = produtoDAO.listar()
+        val listaDeProdutos = produtoDAO.listar()
 
-        if(listaProdutos.isNotEmpty()) {
-            listaProdutos.forEach { produto ->
+        var texto = ""
+
+        if(listaDeProdutos.isNotEmpty()) {
+            listaDeProdutos.forEach { produto ->
+
+                texto += "ID: ${produto.idProduto} | Título: ${produto.titulo}\n"
+
                 Log.i(
                     "info_db",
                     "ID: ${produto.idProduto} | Título: ${produto.titulo}")
             }
+
+            binding.textResultado.text = texto
+
+        } else {
+            binding.textResultado.text = "Nenhum produto cadastrado"
         }
 
     }

@@ -23,8 +23,10 @@ class DatabaseHelper(context: Context): SQLiteOpenHelper(
 
         Log.i("info_db", "Executou onCreate -> Helper")
 
-        val sql = "CREATE TABLE IF NOT EXISTS " +
-                    "$TABELA_PRODUTOS(" +
+        val sql =
+            "CREATE TABLE IF NOT EXISTS " +
+                "$TABELA_PRODUTOS" +
+                    "(" +
                         "$ID_PRODUTO INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
                         "$TITULO VARCHAR(100), " +
                         "$DESCRICAO TEXT" +
